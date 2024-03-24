@@ -1,0 +1,71 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Gestion des utilisateurs{% endblock %}
+
+{% block body %}
+    {% for message in app.flashes('success') %}
+        <div class="alert alert-success">
+            {{ message }}
+        </div>
+    {% endfor %}
+
+    {# Message d'erreur #}
+    {% for message in app.flashes('error') %}
+        <div class="alert alert-danger">
+            {{ message }}
+        </div>
+    {% endfor %}
+
+    <h1>Utilisateurs</h1>
+
+    <table class="table">
+        <thead>
+            <tr>
+                <th scope="col">#</th>
+                <th scope="col">Nom</th>
+                <th scope="col">Rôle</th>
+                <th scope="col">Actions</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for user in users %}
+                <tr>
+                    <th scope="row">{{ user.id }}</th>
+                    <td>{{ user.nom }}</td>
+                    <td>
+                        {% if 'ROLE_ADMIN' in user.roles %}
+                            <span class=" badge rounded-pill text-bg-warning">
+                            Administrateur
+                        </span>
+                        {% endif %}
+                    </td>
+                    <td class="d-flex align-items-center gap-2">
+                        <form
+                            action="{{ path('app_user_delete', { id: user.id }) }}"
+                            method="post"
+                            onsubmit="return confirm('Êtes-vous sûr de vouloir supprimer ce compte utilisateur ?')"
+                        >
+                            <input type="hidden" name="_method" value="DELETE">
+                            <input type="hidden" name="_token" value="{{ csrf_token('delete_user-'~ user.id) }}">
+                            <button class="btn btn-danger">Supprimer</button>
+                        </form>
+
+                        {#
+                            Affiche le bouton "Devenir administrateur" si l'utilisateur
+                            ne possède pas de rôle admin (ROLE_ADMIN)
+                        #}
+                        {% if 'ROLE_ADMIN' not in user.roles %}
+                            <form action="{{path('app_admin_change_role', { id: user.id }) }}" method="post">
+                                <input type="hidden" name="_token" value="{{ csrf_token('admin_user-' ~ user.id) }}"/>
+                                <button class="btn btn-primary">Devenir administrateur</button>
+                            </form>
+                            {# <a href="{{ path('app_admin_change_role', { id: user.id }) }}" class="btn btn-primary">
+                                Devenir administrateur
+                            </a> #}
+                        {% endif %}
+                    </td>
+                </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+{% endblock %}

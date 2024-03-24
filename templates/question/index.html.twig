@@ -1,0 +1,53 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Accueil{% endblock %}
+
+{% block body %}
+    {% for messageFlash in app.flashes('success') %}
+        <div class="alert alert-success">
+            {{ messageFlash }}
+        </div>
+    {% endfor %}
+
+    <div class="text-center pb-5 pt-2">
+        <h1 class="display-5">Tu te poses une question ?</h1>
+        {% if app.user %}
+            <a class="lead" href="{{ path('app_question_new') }}">Viens poser ta question ici !</a>
+        {% else %}
+            <p class="lead"><a href="{{ path('app_login') }}">Connecte-toi</a> et poses ta question !</p>
+        {% endif %}
+    </div>
+
+    <ul class="list-group">
+        {% for question in questions %}
+            <li class="list-group-item p-3 {{ question.user is same as(app.user) ? 'border border-2 border-success' : '' }}">
+                {# Affiche un badge si la question est celle de l'utilisateur connecté #}
+                {% if question.user is same as(app.user) %}
+                    <span class="badge rounded-pill text-bg-success mb-2">
+                        Votre question
+                    </span>
+                {% endif %}
+                <h5>
+                    <a href="{{ path('app_question_reponses', { id: question.id }) }}">
+                        {{ question.titre }}
+                    </a>
+                </h5>
+                {% if question.contenu %}
+                    <p>{{ question.contenu|slice(0, 50) }}...</p>
+                {% endif %}
+                <small class="text-secondary d-flex align-items-center gap-1">
+                    <img
+                            src="{{ asset(question.user.avatar) }}"
+                            alt="{{ question.user.nom }}"
+                            class="rounded-circle"
+                            style="width: 25px; height: 25px"
+                    >
+                    {{ question.user.nom }} a posé une question
+                    le {{ question.dateCreation|date('d.m.Y') }}
+                </small>
+            </li>
+        {% else %}
+            <p>Aucune question pour le moment</p>
+        {% endfor %}
+    </ul>
+{% endblock %}

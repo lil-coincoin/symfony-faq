@@ -1,0 +1,19 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Modifier ma question{% endblock %}
+
+{% block body %}
+<div class="w-50 mx-auto">
+    <h1>Modifier ma question</h1>
+
+    {% for message in app.flashes('success') %}
+        <div class="alert alert-success">
+            {{ message }}
+        </div>
+    {% endfor %}
+
+    <div class="mt-5">
+        {{ form(formEditQuestion) }}
+    </div>
+</div>
+{% endblock %}
